@@ -5,6 +5,8 @@ import (
 	httpserver "http-server/http_server"
 	"log"
 	"net"
+	"os"
+	"strconv"
 )
 
 func main() {
@@ -25,10 +27,23 @@ func main() {
 }
 func handler(conn net.Conn) {
 	defer conn.Close()
-	http, err := httpserver.Parse(conn)
+	request, response, err := httpserver.Parse(conn)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	fmt.Println(http.GetMethod(), http.GetVersion() == httpserver.V1_0, http.GetPath())
+	response.Write([]byte("HTTP/1.1 100 Continue\r\n\r\n"))
+	log.Println(request.GetMethod(), request.GetVersion() == httpserver.V1_0, request.GetPath())
+	if value, has := request.GetHeader("content_length"); has == true {
+		if len, err := strconv.Atoi(value); err == nil {
+			var d []byte = make([]byte, len)
+			request.Read(d)
+			fmt.Println(d)
+			f, _ := os.Create("tmp")
+			f.Write(d)
+			defer f.Close()
+		} else {
+			log.Println(err)
+		}
+	}
 }
