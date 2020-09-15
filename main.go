@@ -46,4 +46,7 @@ func handler(conn net.Conn) {
 			log.Println(err)
 		}
 	}
+	response.WriteCodeDescription(200, "Xyec")
+	response.AddHeader("host", "localhost")
+	response.WriteHeaders()
 }

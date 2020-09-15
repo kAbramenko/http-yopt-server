@@ -240,7 +240,7 @@ func (http *HTTPResponse) WriteCodeDescription(code int, description string) (in
 	if err != nil {
 		return 0, err
 	}
-	n, err = http.Write([]byte(description))
+	n, err = http.Write([]byte(" " + description))
 	counter += n
 	if err != nil {
 		return 0, err
@@ -278,6 +278,11 @@ func (http *HTTPResponse) WriteHeaders() (int, error) {
 			return 0, err
 		}
 		n, err = http.Write([]byte(value))
+		counter += n
+		if err != nil {
+			return 0, err
+		}
+		n, err = http.Write([]byte("\r\n"))
 		counter += n
 		if err != nil {
 			return 0, err
